@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -14,10 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Commands.Movement.Drive;
 import frc.robot.Constants.kDrivers;
+import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Swerve;
 import monologue.Logged;
@@ -34,6 +38,7 @@ public class Robot extends TimedRobot implements Logged{
   // Subsystems
   public static Swerve mSwerve = new Swerve();
   public static Shooter mShooter = new Shooter();
+  public static Intake mIntake = new Intake();
 
   // autos
 
@@ -83,10 +88,7 @@ public class Robot extends TimedRobot implements Logged{
     CommandScheduler.getInstance().run();
 
     Monologue.setFileOnly(DriverStation.isFMSAttached());
-
     Monologue.updateAll();
-
-
   }
 
   private void configureBindings() {
@@ -107,6 +109,15 @@ public class Robot extends TimedRobot implements Logged{
       .whileTrue(Commands.print("up"));
     new POVButton(Driver, kDrivers.kcontrollerConstants.kButtonConstants.POV_DOWN)
       .whileTrue(Commands.print("Down"));
+  }
+
+  public void registerNamedCommands(){
+    NamedCommands.registerCommand("ShooterFull", mShooter.ShootingMode());
+    NamedCommands.registerCommand("ShooterIdle", mShooter.IdleMode());
+    NamedCommands.registerCommand("IntakeDown", new InstantCommand(()->mIntake.IntakeDown()));
+    NamedCommands.registerCommand("IntakeUp", new InstantCommand(()->mIntake.IntakeUp()));
+    NamedCommands.registerCommand("IntakeSpit", new InstantCommand(()->mIntake.IntakeSpit()));
+    NamedCommands.registerCommand("IntakeFeed", new InstantCommand(()->mIntake.FeedShooter()));
   }
 
   @Override
