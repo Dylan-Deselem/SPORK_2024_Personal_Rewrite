@@ -1,0 +1,80 @@
+package frc.robot.Commands.Movement;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
+import frc.robot.Constants.kSwerve;
+import frc.robot.Subsystems.Swerve;
+
+public class Drive extends Command{
+
+
+    private double xTranslation;
+    private double yTranslation;
+    private double OmegaRadiansPerSecond;
+    private double AngleTranslation;
+    private double Theta;
+    private boolean fieldOrentation;
+    private boolean slow;
+    private boolean AngleControl;
+    public Swerve swerve;
+    
+    public Drive(
+    DoubleSupplier xTrans,
+    DoubleSupplier yTrans,
+    DoubleSupplier OmegaRadiansPerSec,
+    DoubleSupplier AngTrans,
+    BooleanSupplier fieldOrentation,
+    BooleanSupplier Slow,
+    BooleanSupplier AngleControl,
+    Swerve swerve
+    ){
+        this.xTranslation = xTrans.getAsDouble();
+        this.yTranslation = yTrans.getAsDouble();
+        this.OmegaRadiansPerSecond = OmegaRadiansPerSec.getAsDouble();
+        this.AngleTranslation = AngTrans.getAsDouble();
+        this.slow = Slow.getAsBoolean();
+        this.fieldOrentation = fieldOrentation.getAsBoolean();
+        this.AngleControl = AngleControl.getAsBoolean();
+        this.swerve = swerve;
+    }
+
+    @Override
+    public void execute() {
+        
+        Theta = Math.atan2(AngleTranslation, OmegaRadiansPerSecond);
+
+        // Adds the dead area to controller input ex: input = 0.01 output = 0, mitigates drift/small movements
+        xTranslation = MathUtil.applyDeadband(xTranslation, kSwerve.kControlConstants.kDeadband);
+        yTranslation = MathUtil.applyDeadband(yTranslation, kSwerve.kControlConstants.kDeadband);
+        OmegaRadiansPerSecond = MathUtil.applyDeadband(OmegaRadiansPerSecond, kSwerve.kControlConstants.kDeadband);
+        
+        // adds curve to controller input ex: 0.5 * 0.5 = 0.25
+        xTranslation = Math.copySign(xTranslation * xTranslation, xTranslation);
+        yTranslation = Math.copySign(yTranslation * yTranslation, yTranslation);
+        OmegaRadiansPerSecond = Math.copySign(OmegaRadiansPerSecond * OmegaRadiansPerSecond, OmegaRadiansPerSecond);
+        
+        // get the rotation going max speed before MODs 
+        OmegaRadiansPerSecond *= kSwerve.MaxSpeed;
+
+        // reduces the value of OmegaRadiansPerSecond 
+        if (slow) {
+            OmegaRadiansPerSecond *= kSwerve.kSpeedMods.slowMod;
+        }
+
+        // redefines OmegaRadiansPerSecond if controling the angle of the robot 
+        if(AngleControl){
+            OmegaRadiansPerSecond = swerve.AngularPID.calculate(Theta, Robot.Gyro.getRotation2d().getRadians());
+        }
+
+        swerve.Drive(
+            new Translation2d(xTranslation, yTranslation),
+            OmegaRadiansPerSecond,
+            fieldOrentation
+        );
+    }
+}
