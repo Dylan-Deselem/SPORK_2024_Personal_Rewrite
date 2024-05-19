@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.kSwerve;
 
 public class Module extends SubsystemBase {
@@ -20,6 +21,7 @@ public class Module extends SubsystemBase {
   private Rotation2d Offset;
 
   private SwerveModuleState State;
+  private SwerveModuleState optimizedState;
 
   public CANcoder AbsoluteEncoder;
   public CANcoderConfiguration config;
@@ -33,9 +35,9 @@ public class Module extends SubsystemBase {
   private RelativeEncoder DriveEncoder;
 
   private SimpleMotorFeedforward OpenLoopFF = new SimpleMotorFeedforward(
-    0,
-    0,
-    0
+    0, 
+    0,  
+    0 
   );
 
   public Module(
@@ -46,6 +48,7 @@ public class Module extends SubsystemBase {
   ) {
     this.Offset = Offset;
     State = new SwerveModuleState();
+    optimizedState = new SwerveModuleState();
 
     DriveMotor = new CANSparkMax(DriveID, MotorType.kBrushless);
     DriveEncoder = DriveMotor.getEncoder();
@@ -77,25 +80,47 @@ public class Module extends SubsystemBase {
 
   public void setState(SwerveModuleState state) {
     State = state;
-    DriveMotor.setVoltage(OpenLoopFF.calculate(state.speedMetersPerSecond));
+    optimizedState = SwerveModuleState.optimize(state, getAngle());
+
+    DriveMotor.setVoltage(OpenLoopFF.calculate(optimizedState.speedMetersPerSecond));
 
     if (state.speedMetersPerSecond < kSwerve.MaxSpeed * 0.01) {
       AzimuthMotor.setVoltage(0);
     } else {
       AzimuthMotor.setVoltage(
         AzimuthController.calculate(
-          state.angle.getRotations(),
+          optimizedState.angle.getRotations(),
           getAngle().getRotations()
         )
       );
     }
   }
 
+
+  public SwerveModuleState getTargetState(){
+    return State;
+  }
+
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(DriveEncoder.getPosition(), getAngle());
+    return new SwerveModulePosition(gearReduction() , getAngle());
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState(State.speedMetersPerSecond, getAngle());
+    return new SwerveModuleState(RPM_TO_M_per_S(DriveEncoder.getVelocity()), getAngle());
+  }
+
+  public SwerveModuleState getOptimizedState(){
+    return new SwerveModuleState(optimizedState.speedMetersPerSecond, optimizedState.angle);
+  }
+
+  // Converts RPM to M/S for any module
+  private double RPM_TO_M_per_S(double RPM){
+    double velocity = (((2 * Math.PI) * (Constants.kSwerve.wheelDiameter /2 )) / 60) * RPM;
+    return velocity;
+  }
+
+  // for SDS L1 module use 8.14, use 6.75 and 6.12 for L2 and L3 respectively 
+  private double gearReduction(){
+    return DriveEncoder.getPosition() / ((Constants.kSwerve.wheelDiameter * Math.PI) / 8.14);
   }
 }

@@ -77,10 +77,8 @@ public class Swerve extends SubsystemBase implements Logged{
   }
 
   @Log.NT
-  @Override
-  public void periodic() {
-    PoseEstimator.getEstimatedPosition();
-
+  public Pose2d getEstimatedPose(){
+    return PoseEstimator.getEstimatedPosition();
   }
 
   public Rotation2d getGyroAngle() {
@@ -150,7 +148,29 @@ public class Swerve extends SubsystemBase implements Logged{
       FL.getState(),
       FR.getState(),
       BL.getState(),
-      BR.getState(),
+      BR.getState()
+    };
+  }
+
+  @Log.NT
+  public SwerveModuleState[] getTargetStates(){
+    return new SwerveModuleState[]
+    {
+      FL.getTargetState(),
+      FR.getTargetState(),
+      BL.getTargetState(),
+      BR.getTargetState()
+    };
+  }
+  
+  @Log.NT
+  public SwerveModuleState[] getOptimizedStates(){
+    return new SwerveModuleState[]
+    {
+      FL.getOptimizedState(),
+      FR.getOptimizedState(),
+      BL.getOptimizedState(),
+      BR.getOptimizedState()
     };
   }
 }

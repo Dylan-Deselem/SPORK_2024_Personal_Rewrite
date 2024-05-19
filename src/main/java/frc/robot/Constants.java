@@ -19,10 +19,10 @@ public class Constants {
     private static double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(
       24
     );
+    public static double wheelDiameter = 4;
     public static double MaxSpeed = Units.feetToMeters(12);
 
     public static class kControlConstants {
-
       public static double kDeadband = 0.1;
     }
 

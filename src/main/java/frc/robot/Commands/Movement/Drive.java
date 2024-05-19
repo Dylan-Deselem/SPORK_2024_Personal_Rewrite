@@ -68,7 +68,7 @@ public class Drive extends Command{
 
         // redefines OmegaRadiansPerSecond if controling the angle of the robot 
         if(AngleControl){
-            OmegaRadiansPerSecond = swerve.AngularPID.calculate(Theta, Robot.Gyro.getRotation2d().getRadians());
+            OmegaRadiansPerSecond = swerve.AngularPID.calculate(Robot.Gyro.getRotation2d().getRadians(), Theta);
         }
 
         swerve.Drive(
