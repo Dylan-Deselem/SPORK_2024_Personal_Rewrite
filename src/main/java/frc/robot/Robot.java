@@ -7,9 +7,8 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,12 +21,13 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Commands.Movement.Drive;
 import frc.robot.Constants.kDrivers;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.LimeLight;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Swerve;
 import monologue.Logged;
 import monologue.Monologue;
 
-public class Robot extends TimedRobot implements Logged{
+public class Robot extends TimedRobot implements Logged {
 
   private Command m_autonomousCommand;
 
@@ -39,6 +39,7 @@ public class Robot extends TimedRobot implements Logged{
   public static Swerve mSwerve = new Swerve();
   public static Shooter mShooter = new Shooter();
   public static Intake mIntake = new Intake();
+  public static LimeLight mLimeLight = new LimeLight();
 
   // autos
 
@@ -52,17 +53,25 @@ public class Robot extends TimedRobot implements Logged{
   @Override
   public void robotInit() {
     Monologue.setupMonologue(this, "Robot", false, false);
-    
+
     mSwerve.setDefaultCommand(
       new Drive(
         () ->
-          -Driver.getRawAxis(kDrivers.kcontrollerConstants.kAxisConstants.kLeftX),
+          -Driver.getRawAxis(
+            kDrivers.kcontrollerConstants.kAxisConstants.kLeftX
+          ),
         () ->
-          -Driver.getRawAxis(kDrivers.kcontrollerConstants.kAxisConstants.kLeftY),
+          -Driver.getRawAxis(
+            kDrivers.kcontrollerConstants.kAxisConstants.kLeftY
+          ),
         () ->
-          Driver.getRawAxis(kDrivers.kcontrollerConstants.kAxisConstants.kRightX),
+          Driver.getRawAxis(
+            kDrivers.kcontrollerConstants.kAxisConstants.kRightX
+          ),
         () ->
-          Driver.getRawAxis(kDrivers.kcontrollerConstants.kAxisConstants.kRightY),
+          Driver.getRawAxis(
+            kDrivers.kcontrollerConstants.kAxisConstants.kRightY
+          ),
         () ->
           !Driver.getRawButton(
             kDrivers.kcontrollerConstants.kButtonConstants.kStart
@@ -75,11 +84,16 @@ public class Robot extends TimedRobot implements Logged{
           Driver.getRawButton(
             kDrivers.kcontrollerConstants.kButtonConstants.kLeftBumper
           ),
+        () ->
+          Driver.getRawButton(
+            kDrivers.kcontrollerConstants.kButtonConstants.kA
+          ),
         mSwerve
       )
     );
 
     configureBindings();
+    registerNamedCommands();
     autoChooser = AutoBuilder.buildAutoChooser("None");
   }
 
@@ -107,17 +121,32 @@ public class Robot extends TimedRobot implements Logged{
 
     new POVButton(Driver, kDrivers.kcontrollerConstants.kButtonConstants.POV_UP)
       .whileTrue(Commands.print("up"));
-    new POVButton(Driver, kDrivers.kcontrollerConstants.kButtonConstants.POV_DOWN)
+    new POVButton(
+      Driver,
+      kDrivers.kcontrollerConstants.kButtonConstants.POV_DOWN
+    )
       .whileTrue(Commands.print("Down"));
   }
 
-  public void registerNamedCommands(){
+  public void registerNamedCommands() {
     NamedCommands.registerCommand("ShooterFull", mShooter.ShootingMode());
     NamedCommands.registerCommand("ShooterIdle", mShooter.IdleMode());
-    NamedCommands.registerCommand("IntakeDown", new InstantCommand(()->mIntake.IntakeDown()));
-    NamedCommands.registerCommand("IntakeUp", new InstantCommand(()->mIntake.IntakeUp()));
-    NamedCommands.registerCommand("IntakeSpit", new InstantCommand(()->mIntake.IntakeSpit()));
-    NamedCommands.registerCommand("IntakeFeed", new InstantCommand(()->mIntake.FeedShooter()));
+    NamedCommands.registerCommand(
+      "IntakeDown",
+      new InstantCommand(() -> mIntake.IntakeDown())
+    );
+    NamedCommands.registerCommand(
+      "IntakeUp",
+      new InstantCommand(() -> mIntake.IntakeUp())
+    );
+    NamedCommands.registerCommand(
+      "IntakeSpit",
+      new InstantCommand(() -> mIntake.IntakeSpit())
+    );
+    NamedCommands.registerCommand(
+      "IntakeFeed",
+      new InstantCommand(() -> mIntake.FeedShooter())
+    );
   }
 
   @Override

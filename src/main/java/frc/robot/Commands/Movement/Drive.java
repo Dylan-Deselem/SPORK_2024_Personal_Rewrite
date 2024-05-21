@@ -21,6 +21,7 @@ public class Drive extends Command{
     private boolean fieldOrentation;
     private boolean slow;
     private boolean AngleControl;
+    private boolean LimeLightTargeting;
     public Swerve swerve;
     
     public Drive(
@@ -31,6 +32,7 @@ public class Drive extends Command{
     BooleanSupplier fieldOrentation,
     BooleanSupplier Slow,
     BooleanSupplier AngleControl,
+    BooleanSupplier LimeLightTargeting,
     Swerve swerve
     ){
         this.xTranslation = xTrans.getAsDouble();
@@ -40,6 +42,7 @@ public class Drive extends Command{
         this.slow = Slow.getAsBoolean();
         this.fieldOrentation = fieldOrentation.getAsBoolean();
         this.AngleControl = AngleControl.getAsBoolean();
+        this.LimeLightTargeting = LimeLightTargeting.getAsBoolean();
         this.swerve = swerve;
     }
 
@@ -66,6 +69,11 @@ public class Drive extends Command{
             OmegaRadiansPerSecond *= kSwerve.kSpeedMods.slowMod;
         }
 
+        // track a Note on the field (currently color based)
+        if (LimeLightTargeting){
+           OmegaRadiansPerSecond = LimelightPropotionalAim();
+        }
+
         // redefines OmegaRadiansPerSecond if controling the angle of the robot 
         if(AngleControl){
             OmegaRadiansPerSecond = swerve.AngularPID.calculate(Robot.Gyro.getRotation2d().getRadians(), Theta);
@@ -76,5 +84,22 @@ public class Drive extends Command{
             OmegaRadiansPerSecond,
             fieldOrentation
         );
+    }
+
+    public double LimelightPropotionalAim(){
+        // its the propotional (requires tuning)
+        double kp = 0.001;
+
+        // get the desired velo
+        double TargetingVelo = Robot.mLimeLight.getTx() * kp;
+
+        // make it go fast
+        TargetingVelo *= kSwerve.MaxSpeed;
+
+        // invert because of Limelight
+        TargetingVelo *= -1;
+
+        // return our velocity
+        return TargetingVelo;
     }
 }
