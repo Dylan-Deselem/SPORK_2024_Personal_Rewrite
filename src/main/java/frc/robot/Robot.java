@@ -7,6 +7,7 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Joystick;
@@ -21,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Commands.Movement.Drive;
 import frc.robot.Constants.kDrivers;
 import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.LimeLight;
+import frc.robot.Subsystems.LimelightHelpers;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Swerve;
 import monologue.Logged;
@@ -39,7 +40,7 @@ public class Robot extends TimedRobot implements Logged {
   public static Swerve mSwerve = new Swerve();
   public static Shooter mShooter = new Shooter();
   public static Intake mIntake = new Intake();
-  public static LimeLight mLimeLight = new LimeLight();
+  public static LimelightHelpers mLimeLight = new LimelightHelpers();
 
   // autos
 
@@ -53,6 +54,17 @@ public class Robot extends TimedRobot implements Logged {
   @Override
   public void robotInit() {
     Monologue.setupMonologue(this, "Robot", false, false);
+
+    // Camera Pose can be set this way which allows for movement of the camera through a match eg. (BumbleB 2024)
+    // this can also be set in the WebUI for limelight, this is best for our use case
+
+    // LimelightHelpers.setCameraPose_RobotSpace("",
+    //  kDefaultPeriod,
+    //  kDefaultPeriod,
+    //  kDefaultPeriod,
+    //  kDefaultPeriod,
+    //  kDefaultPeriod,
+    //  kDefaultPeriod);
 
     mSwerve.setDefaultCommand(
       new Drive(
@@ -103,6 +115,49 @@ public class Robot extends TimedRobot implements Logged {
 
     Monologue.setFileOnly(DriverStation.isFMSAttached());
     Monologue.updateAll();
+
+    boolean Reject = false;
+    // seting the orentation of the robot based on gyro mesurements
+    // used for megatag 2
+    LimelightHelpers.SetRobotOrientation(
+      "",
+      Gyro.getYaw(),
+      Gyro.getRate(),
+      Gyro.getPitch(),
+      0,
+      Gyro.getRoll(),
+      0
+    );
+
+    // for using Vision in pose estimation it requires
+    // The pose of the limelight must be configured via the API or the webUI
+    // a field map has been uploaded (.fmap) this is provided by FIRST
+    // a Bot pose estimate is made per periodic cycle
+    // Set robot orentaton is has a blue corner origin
+
+    // creates a BotPose est
+    LimelightHelpers.PoseEstimate MegaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(
+      ""
+    );
+
+    // if the rate of rotation is above 720 degrees per second, regect the pose
+    if (Math.abs(Gyro.getRate()) > 720) {
+      Reject = true;
+    }
+    // if no tags, reject the pose
+    if (MegaTag2.tagCount == 0) {
+      Reject = true;
+    }
+    // if the pose was not rejected set the values to trust in pose est and update the pose
+    if (!Reject) {
+      mSwerve.PoseEstimator.setVisionMeasurementStdDevs(
+        VecBuilder.fill(0.7, 0.7, 99999999)
+      );
+      mSwerve.PoseEstimator.addVisionMeasurement(
+        MegaTag2.pose,
+        MegaTag2.timestampSeconds
+      );
+    }
   }
 
   private void configureBindings() {
@@ -118,14 +173,6 @@ public class Robot extends TimedRobot implements Logged {
     )
       .toggleOnTrue(mShooter.AmpMode())
       .toggleOnFalse(mShooter.IdleMode());
-
-    new POVButton(Driver, kDrivers.kcontrollerConstants.kButtonConstants.POV_UP)
-      .whileTrue(Commands.print("up"));
-    new POVButton(
-      Driver,
-      kDrivers.kcontrollerConstants.kButtonConstants.POV_DOWN
-    )
-      .whileTrue(Commands.print("Down"));
   }
 
   public void registerNamedCommands() {

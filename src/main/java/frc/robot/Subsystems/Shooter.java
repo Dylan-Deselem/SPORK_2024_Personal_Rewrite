@@ -65,10 +65,10 @@ public class Shooter extends SubsystemBase {
     }
 
     LNEO.setVoltage(
-      SpeedsController.calculate(DesiredSpeed, LNEO.getBusVoltage())
+      SpeedsController.calculate(LNEO.getBusVoltage() , DesiredSpeed)
     );
     RNEO.setVoltage(
-      SpeedsController.calculate(DesiredSpeed, RNEO.getBusVoltage())
+      SpeedsController.calculate(RNEO.getBusVoltage() , DesiredSpeed)
     );
   }
 

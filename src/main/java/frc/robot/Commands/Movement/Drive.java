@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.Constants.kSwerve;
+import frc.robot.Subsystems.LimelightHelpers;
 import frc.robot.Subsystems.Swerve;
 
 public class Drive extends Command{
@@ -91,7 +92,7 @@ public class Drive extends Command{
         double kp = 0.001;
 
         // get the desired velo
-        double TargetingVelo = Robot.mLimeLight.getTx() * kp;
+        double TargetingVelo = LimelightHelpers.getTX("") * kp;
 
         // make it go fast
         TargetingVelo *= kSwerve.MaxSpeed;

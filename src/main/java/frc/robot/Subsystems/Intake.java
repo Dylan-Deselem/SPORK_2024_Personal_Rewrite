@@ -21,18 +21,22 @@ public class Intake extends SubsystemBase{
     public RelativeEncoder PivotEncoder;
 
     public Intake(){
+        // set up voltage comp and reduce strain on the battery by seting a curent limit
         PivotNEO.enableVoltageCompensation(kIntake.kLimits.NominalVoltage);
         PivotNEO.setSmartCurrentLimit(kIntake.kLimits.CurrentLimit);
         PivotNEO.setIdleMode(IdleMode.kBrake);
 
+        // Intake Neo 550 voltage comp and idle mode, coast so drive team can put in the first note
         IntakeNeoMini.enableVoltageCompensation(kIntake.kLimits.NominalVoltage);
         IntakeNeoMini.setIdleMode(IdleMode.kCoast);
 
+        // The PID controller set up and Smart motion set up for smooth movement 
         IntakePID = PivotNEO.getPIDController();
         IntakePID.setP(kIntake.kPIDConstants.kP);
         IntakePID.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
         IntakePID.setSmartMotionMaxVelocity(kIntake.kLimits.MaxRPM, 0);
 
+        // track the pivot angle
         PivotEncoder = PivotNEO.getEncoder();
     }
 

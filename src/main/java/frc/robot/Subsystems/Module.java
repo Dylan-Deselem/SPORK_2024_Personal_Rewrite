@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -96,9 +97,14 @@ public class Module extends SubsystemBase {
     }
   }
 
-
+  // Gets the targeted state before optimizing 
   public SwerveModuleState getTargetState(){
     return State;
+  }
+
+  // Gets the targeted state after optimizing 
+  public SwerveModuleState getOptimizedState(){
+    return optimizedState;
   }
 
   public SwerveModulePosition getPosition() {
@@ -107,10 +113,6 @@ public class Module extends SubsystemBase {
 
   public SwerveModuleState getState() {
     return new SwerveModuleState(RPM_TO_M_per_S(DriveEncoder.getVelocity()), getAngle());
-  }
-
-  public SwerveModuleState getOptimizedState(){
-    return new SwerveModuleState(optimizedState.speedMetersPerSecond, optimizedState.angle);
   }
 
   // Converts RPM to M/S for any module
