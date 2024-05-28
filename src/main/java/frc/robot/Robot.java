@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -107,6 +108,7 @@ public class Robot extends TimedRobot implements Logged {
     configureBindings();
     registerNamedCommands();
     autoChooser = AutoBuilder.buildAutoChooser("None");
+    SmartDashboard.putData("Autos", autoChooser);
   }
 
   @Override
