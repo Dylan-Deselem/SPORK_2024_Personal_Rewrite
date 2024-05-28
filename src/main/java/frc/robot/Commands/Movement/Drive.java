@@ -45,6 +45,8 @@ public class Drive extends Command{
         this.AngleControl = AngleControl.getAsBoolean();
         this.LimeLightTargeting = LimeLightTargeting.getAsBoolean();
         this.swerve = swerve;
+
+        addRequirements(swerve);
     }
 
     @Override

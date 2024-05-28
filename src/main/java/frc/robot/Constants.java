@@ -154,8 +154,8 @@ public class Constants {
 
     public static class kPorts {
 
-      public static int LeftNeoPort = 1;
-      public static int RightNeoPort = 2;
+      public static int LeftNeoPort = 9;
+      public static int RightNeoPort = 10;
     }
 
     public static class kSpeeds {
@@ -182,8 +182,8 @@ public class Constants {
   public static class kIntake {
   
     public static class kPorts {
-        public static int IntakeNeoPort = 1;
-        public static int PivotNeoPort = 2;
+        public static int IntakeNeoPort = 11;
+        public static int PivotNeoPort = 12;
     }
 
     public static class kLimits {

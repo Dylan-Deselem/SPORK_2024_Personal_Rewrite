@@ -173,6 +173,7 @@ public class Robot extends TimedRobot implements Logged {
     )
       .toggleOnTrue(mShooter.AmpMode())
       .toggleOnFalse(mShooter.IdleMode());
+
   }
 
   public void registerNamedCommands() {
