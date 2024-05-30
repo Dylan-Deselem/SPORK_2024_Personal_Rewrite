@@ -23,6 +23,7 @@ public class Constants {
     public static double MaxSpeed = Units.feetToMeters(12);
 
     public static class kControlConstants {
+
       public static double kDeadband = 0.1;
     }
 
@@ -75,13 +76,9 @@ public class Constants {
       public static Rotation2d BrOffset = Rotation2d.fromDegrees(0);
     }
 
-    public static class kPIDConstants {
+    public static class kPIDConstants {}
 
-    }
-
-    public static class kFeedForwardConstatnts {
-
-    }
+    public static class kFeedForwardConstatnts {}
 
     public static class kMessurements {
 
@@ -180,32 +177,51 @@ public class Constants {
   }
 
   public static class kIntake {
-  
+
     public static class kPorts {
-        public static int IntakeNeoPort = 11;
-        public static int PivotNeoPort = 12;
+
+      public static int IntakeNeoPort = 11;
+      public static int PivotNeoPort = 12;
     }
 
     public static class kLimits {
-        public static int NominalVoltage = 12;
-        public static int CurrentLimit = 20;
-        public static double MaxRPM = 30;
+
+      public static int NominalVoltage = 12;
+      public static int CurrentLimit = 20;
+      public static double MaxRPM = 30;
     }
 
     public static class kPIDConstants {
-        public static double kP = 0.1;
+
+      public static double kP = 0.1;
     }
 
     public static class kPositions {
-        public static double ShootingPOS = 0;
-        public static double IntakePOS = 48;
-        public static double spitPOS = 28;
+
+      public static double ShootingPOS = 0;
+      public static double IntakePOS = 48;
+      public static double spitPOS = 28;
     }
 
     public static class kSpeeds {
-        public static double IntakeSpeed = 1;
-        public static double FeedSpeed = -1;
-        
+
+      public static double IntakeSpeed = 1;
+      public static double FeedSpeed = -1;
+    }
+  }
+
+  public static class kClimber {
+
+    public static class kPorts {
+
+      public static int LeftPort = 13;
+      public static int RightPort = 14;
+    }
+
+    public static class kSpeeds {
+
+      public static double WindUp = 12;
+      public static double WindDown = -12;
     }
   }
 }

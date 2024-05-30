@@ -7,11 +7,13 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Commands.Movement.Drive;
 import frc.robot.Constants.kDrivers;
+import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LimelightHelpers;
 import frc.robot.Subsystems.Shooter;
@@ -41,6 +44,7 @@ public class Robot extends TimedRobot implements Logged {
   public static Swerve mSwerve = new Swerve();
   public static Shooter mShooter = new Shooter();
   public static Intake mIntake = new Intake();
+  public static Climber mClimber = new Climber();
   public static LimelightHelpers mLimeLight = new LimelightHelpers();
 
   // autos
@@ -176,6 +180,18 @@ public class Robot extends TimedRobot implements Logged {
       .toggleOnTrue(mShooter.AmpMode())
       .toggleOnFalse(mShooter.IdleMode());
 
+    new JoystickButton(
+      Operator,
+      kDrivers.kcontrollerConstants.kButtonConstants.kA
+    )
+      .onTrue(new InstantCommand(() -> mClimber.ClimbersUP()))
+      .toggleOnTrue(new InstantCommand(() -> mClimber.ClimbersDown()));
+
+    new POVButton(
+      Operator,
+      kDrivers.kcontrollerConstants.kButtonConstants.POV_DOWN
+    )
+      .toggleOnFalse(Commands.print("Down"));
   }
 
   public void registerNamedCommands() {
@@ -234,7 +250,10 @@ public class Robot extends TimedRobot implements Logged {
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    mIntake.PivotNEO.setIdleMode(IdleMode.kBrake);
+    // climb to brake
+  }
 
   @Override
   public void testInit() {
