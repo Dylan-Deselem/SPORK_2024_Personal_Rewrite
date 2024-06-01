@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.Constants.kSwerve;
+import frc.robot.Constants.kSwerve.kVision.kLimelightNames;
 import frc.robot.Subsystems.LimelightHelpers;
 import frc.robot.Subsystems.Swerve;
 
@@ -72,7 +73,7 @@ public class Drive extends Command{
             OmegaRadiansPerSecond *= kSwerve.kSpeedMods.slowMod;
         }
 
-        // track a Note on the field (currently color based)
+        // track a Note on the field
         if (LimeLightTargeting){
            OmegaRadiansPerSecond = LimelightPropotionalAim();
         }
@@ -94,7 +95,7 @@ public class Drive extends Command{
         double kp = 0.001;
 
         // get the desired velo
-        double TargetingVelo = LimelightHelpers.getTX("") * kp;
+        double TargetingVelo = LimelightHelpers.getTX(kLimelightNames.Limelight2) * kp;
 
         // make it go fast
         TargetingVelo *= kSwerve.MaxSpeed;

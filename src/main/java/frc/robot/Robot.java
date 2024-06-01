@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Commands.Movement.Drive;
 import frc.robot.Constants.kDrivers;
+import frc.robot.Constants.kSwerve.kVision.kLimelightNames;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LimelightHelpers;
@@ -126,7 +127,7 @@ public class Robot extends TimedRobot implements Logged {
     // seting the orentation of the robot based on gyro mesurements
     // used for megatag 2
     LimelightHelpers.SetRobotOrientation(
-      "",
+      kLimelightNames.LimeLight1,
       Gyro.getYaw(),
       Gyro.getRate(),
       Gyro.getPitch(),
@@ -143,10 +144,10 @@ public class Robot extends TimedRobot implements Logged {
 
     // creates a BotPose est
     LimelightHelpers.PoseEstimate MegaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(
-      ""
+      kLimelightNames.LimeLight1
     );
 
-    // if the rate of rotation is above 720 degrees per second, regect the pose
+    // if the rate of rotation is above 720 degrees per second, reject the pose
     if (Math.abs(Gyro.getRate()) > 720) {
       Reject = true;
     }
@@ -157,7 +158,8 @@ public class Robot extends TimedRobot implements Logged {
     // if the pose was not rejected set the values to trust in pose est and update the pose
     if (!Reject) {
       mSwerve.PoseEstimator.setVisionMeasurementStdDevs(
-        VecBuilder.fill(0.7, 0.7, 99999999)
+        // the higher the number the less trust it will have
+        VecBuilder.fill(0.7 /* X */, 0.7 /* Y */, 99999999 /* Theta */)
       );
       mSwerve.PoseEstimator.addVisionMeasurement(
         MegaTag2.pose,

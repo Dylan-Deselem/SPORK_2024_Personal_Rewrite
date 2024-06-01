@@ -27,6 +27,15 @@ public class Constants {
       public static double kDeadband = 0.1;
     }
 
+    public static class kVision {
+
+      public static class kLimelightNames {
+
+        public static String LimeLight1 = "Limelight";
+        public static String Limelight2 = "Limelight2";
+      }
+    }
+
     public static class kAuto {
 
       public static HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig(
